@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
     Animator anim;
     [SerializeField]
     private float turnSpeed;
+    public float backSpeed = 3f;
     private void Awake()
     {
         CharacterController = GetComponent<CharacterController>();
@@ -18,15 +19,21 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        var horizontalM = Input.GetAxis("Horizontal");
-        var verticalM = Input.GetAxis("Vertical");
+        var horizontal = Input.GetAxis("Horizontal");
+        var vertical = Input.GetAxis("Vertical");
+        var movement = new Vector3(horizontal, 0, vertical);
+        anim.SetFloat("Speed", vertical);
+        transform.Rotate(Vector3.up, horizontal * turnSpeed * Time.deltaTime);
+        if (vertical != 0)
+        {
+            float moveSpeed = (vertical > 0) ? PlayerSpeed : backSpeed;
+            CharacterController.SimpleMove(transform.forward * vertical * moveSpeed);
+            //audioSource.clip = audioClip;
+            //audioSource.Play();
 
-        var playerMove = new Vector3(horizontalM, 0, verticalM);
-        CharacterController.SimpleMove(playerMove * Time.deltaTime*PlayerSpeed);
-        anim.SetFloat("Speed", playerMove.magnitude);
+            //Quaternion newDir = Quaternion.LookRotation(playerMove);
+            //transform.rotation = Quaternion.Slerp(transform.rotation, newDir, Time.deltaTime*turnSpeed) ;
 
-        Quaternion newDir = Quaternion.LookRotation(playerMove);
-        transform.rotation = Quaternion.Slerp(transform.rotation, newDir, Time.deltaTime*turnSpeed) ;
-
+        }
     }
 }
